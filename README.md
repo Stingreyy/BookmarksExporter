@@ -1,5 +1,7 @@
 # Chrome Bookmark Exporter Extension
 
+Ever had the problem when trying to export a bookmark in Chrome that you can only export your entire bookmark library instead of just one specific folder? Here is the solution to your problem!
+
 This is a Chrome extension that allows you to selectively export your bookmarks or bookmark folders to multiple formats, including JSON, CSV, and HTML. You can navigate through your bookmarks, choose the specific items you want, and easily download them in the desired format.
 
 ## Features
