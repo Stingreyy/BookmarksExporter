@@ -2,20 +2,83 @@
 <html>
   <head>
     <title>Export Bookmarks</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #000; /* Change background to black for better contrast */
+        margin: 20px;
+        color: #fff;
+      }
+
+      h1 {
+        color: #007BFF;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      /* Bookmark List Styles */
+      #bookmark-list {
+        list-style-type: none;
+        padding: 0;
+        margin-top: 0;
+        margin-left: 0; /* Start directly from the left */
+      }
+
+      li {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Expand Button Styles */
+      button.expand-button {
+        background: none;
+        border: none;
+        color: #007BFF;
+        font-weight: bold;
+        cursor: pointer;
+        margin-right: 10px;
+        padding: 0;
+        font-size: 2em;
+      }
+
+      button.expand-button:hover {
+        color: #0056b3;
+      }
+
+      input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+      /* Export Button Styles */
+      button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px 0;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+    </style>
   </head>
   <body>
-    <!-- Title for the extension popup -->
     <h1>Export Bookmarks</h1>
-    
-    <!-- Container where bookmarks will be listed dynamically -->
-    <div id="bookmark-list"></div>
-    
-    <!-- Buttons to export bookmarks to different formats -->
+    <ul id="bookmark-list"></ul> <!-- Changed from div to ul for proper list semantics -->
     <button id="export-json">Export to JSON</button>
     <button id="export-csv">Export to CSV</button>
     <button id="export-html">Export to HTML</button>
-    
-    <!-- Link to JavaScript to handle functionality -->
     <script src="popup.js"></script>
   </body>
 </html>
