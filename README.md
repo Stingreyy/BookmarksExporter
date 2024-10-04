@@ -49,6 +49,13 @@ The HTML file that defines the user interface for the extension popup, including
 
 Contains the JavaScript code to interact with the Chrome Bookmarks API, generate the export files, and manage the user interface.
 
+#### `manifest.json`
+- **manifest_version**: Specifies the version of the Chrome extension schema being used.
+- **name**: The name of the extension as it will appear in Chrome Web Store.
+- **version**: Version of the extension. Update with new versions.
+- **permissions**: Requests access to Chrome bookmarks.
+- **action**: Specifies `popup.html` as the user interface for the extension.
+
 ## Contributing
 
 Feel free to submit issues or pull requests if you find any bugs or have suggestions for new features. Contributions are always welcome!

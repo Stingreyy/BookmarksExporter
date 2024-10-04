@@ -1,9 +1,11 @@
+// Wait for the DOM to fully load before running the script
 document.addEventListener('DOMContentLoaded', function () {
-    // Startar från roten av bokmärkesträdet
+    // Fetch the entire bookmark tree and display it in the popup
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
       displayBookmarks(bookmarkTreeNodes);
     });
   
+    // Add event listeners to export buttons for JSON, CSV, and HTML
     document.getElementById('export-json').addEventListener('click', function () {
       exportBookmarks('json');
     });
@@ -17,12 +19,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
   
+  // Function to display bookmarks in the popup interface
   function displayBookmarks(bookmarkNodes, parentElement = document.getElementById('bookmark-list')) {
+    // Loop through each bookmark node and add it to the UI
     bookmarkNodes.forEach(function (node) {
-      // Skapa ett listobjekt för varje bokmärke eller mapp
+      // Create a list item to display bookmark/folder
       const li = document.createElement('li');
-      li.textContent = node.title || 'No Title';
-      
+      li.textContent = node.title || 'No Title'; // Use 'No Title' if the bookmark doesn't have a title
+  
+      // Add a checkbox for each bookmark/folder so user can select it for export
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.value = node.id;
@@ -30,38 +35,44 @@ document.addEventListener('DOMContentLoaded', function () {
       li.appendChild(checkbox);
       parentElement.appendChild(li);
   
-      // Om noden är en mapp, ge möjlighet att expandera den
+      // If the node is a folder, add an expand button
       if (node.children && node.children.length > 0) {
         const expandButton = document.createElement('button');
         expandButton.textContent = '+';
+  
+        // Add click event listener for expanding/collapsing folders
         expandButton.addEventListener('click', function () {
           if (expandButton.textContent === '+') {
-            expandButton.textContent = '-';
+            expandButton.textContent = '-'; // Toggle the button text to indicate expanded state
             const childList = document.createElement('ul');
             li.appendChild(childList);
-            displayBookmarks(node.children, childList);
+            displayBookmarks(node.children, childList); // Recursively display child bookmarks
           } else {
-            expandButton.textContent = '+';
-            li.removeChild(li.lastElementChild); // Ta bort childList när du kollapsar
+            expandButton.textContent = '+'; // Toggle back to collapsed state
+            li.removeChild(li.lastElementChild); // Remove the child list from UI
           }
         });
   
-        li.insertBefore(expandButton, checkbox); // Placera expand-knappen innan checkboxen
+        // Insert the expand button before the checkbox
+        li.insertBefore(expandButton, checkbox);
       }
     });
   }
   
+  // Function to handle exporting selected bookmarks in the specified format
   function exportBookmarks(format) {
     const selectedBookmarks = [];
   
-    // Hämta alla markerade bokmärken
+    // Get all checked checkboxes and add their associated bookmarks to selectedBookmarks
     document.querySelectorAll('#bookmark-list input:checked').forEach(function (checkbox) {
       const bookmarkId = checkbox.value;
+  
+      // Get details of each selected bookmark node
       chrome.bookmarks.getSubTree(bookmarkId, function (bookmarkNodes) {
         bookmarkNodes.forEach(function (node) {
-          collectBookmarks(node, selectedBookmarks);
+          collectBookmarks(node, selectedBookmarks); // Collect bookmarks recursively from folders
           
-          // Exportera om vi har minst ett bokmärke
+          // Call the appropriate export function based on format selected
           if (selectedBookmarks.length > 0) {
             switch (format) {
               case 'json':
@@ -80,27 +91,31 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
   
+  // Recursive function to collect all bookmarks from folders
   function collectBookmarks(node, bookmarkList) {
-    // Om det är ett bokmärke (inte en mapp), lägg till det
     if (node.url) {
+      // If the node is a bookmark (has a URL), add it to the list
       bookmarkList.push(node);
     }
-    // Om det är en mapp, gå igenom alla barn
     if (node.children) {
+      // If the node is a folder, recursively collect all its children
       node.children.forEach(function (child) {
         collectBookmarks(child, bookmarkList);
       });
     }
   }
   
+  // Function to export bookmarks in JSON format
   function exportToJSON(bookmarks) {
     const jsonExport = JSON.stringify(bookmarks, null, 2);
     downloadFile(jsonExport, 'bookmarks.json', 'application/json');
   }
   
+  // Function to export bookmarks in CSV format
   function exportToCSV(bookmarks) {
-    let csvExport = 'Title,URL\n';
+    let csvExport = 'Title,URL\n'; // Header for CSV file
     
+    // Add each bookmark as a new line in CSV
     bookmarks.forEach(function (bookmark) {
       if (bookmark.url) {
         csvExport += `"${bookmark.title}","${bookmark.url}"\n`;
@@ -110,9 +125,11 @@ document.addEventListener('DOMContentLoaded', function () {
     downloadFile(csvExport, 'bookmarks.csv', 'text/csv');
   }
   
+  // Function to export bookmarks in HTML format
   function exportToHTML(bookmarks) {
     let htmlExport = '<html><body><ul>';
     
+    // Add each bookmark as a clickable link in HTML
     bookmarks.forEach(function (bookmark) {
       if (bookmark.url) {
         htmlExport += `<li><a href="${bookmark.url}">${bookmark.title}</a></li>`;
@@ -123,15 +140,16 @@ document.addEventListener('DOMContentLoaded', function () {
     downloadFile(htmlExport, 'bookmarks.html', 'text/html');
   }
   
+  // Function to download the generated file
   function downloadFile(data, filename, type) {
-    const blob = new Blob([data], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const blob = new Blob([data], { type }); // Create a Blob with the data
+    const url = URL.createObjectURL(blob); // Create a URL for the Blob
+    const a = document.createElement('a'); // Create an anchor element
     a.href = url;
-    a.download = filename;
+    a.download = filename; // Set the filename for the download
     document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-    a.remove();
+    a.click(); // Programmatically click the anchor to trigger the download
+    URL.revokeObjectURL(url); // Revoke the object URL after download
+    a.remove(); // Remove the anchor from the DOM
   }
   
